@@ -2,32 +2,12 @@
 #include "Poco/Net/StreamSocket.h"
 #include "Poco/Net/SocketAddress.h"
 
-//TCP接收缓冲区大小
-#define BUFFER_SIZE 1024
-//单次连接接收数据最大长度
-#define MAX_DATA_SIZE 1024*10
+//最大接收数据长度
+#define BUFFER_SIZE 10240
 
 using Poco::Net::SocketAddress;
 using Poco::Net::StreamSocket;
 using Poco::Exception;
-
-//接收服务器单次发送的数据
-int receiveAll(StreamSocket socket,char* data,int* dataLength) {
-	*dataLength = 0;
-	char buffer[BUFFER_SIZE];
-	
-	/// Returns the number of bytes received.
-	/// A return value of 0 means a graceful shutdown
-	/// of the connection from the peer.
-	int n = socket.receiveBytes(buffer, sizeof(buffer));
-	while (n > 0)
-	{
-		memcpy_s(data+(*dataLength),MAX_DATA_SIZE,buffer,n);
-		*dataLength += n;
-		n = socket.receiveBytes(buffer, sizeof(buffer));
-	}
-	return 0;
-}
 
 int main(int argc, const char* argv[])
 {
@@ -36,15 +16,23 @@ int main(int argc, const char* argv[])
 	try
 	{
 		StreamSocket socket(address);
-		char* data = new char[MAX_DATA_SIZE];
-		int dataLength = 0;
-		receiveAll(socket, data, &dataLength);
-		data[dataLength] = '\0';
-		std::cout << data << std::endl;
+
+		socket.sendBytes("qqq",3);
+		socket.sendBytes("www", 3);
+		//Sleep(10000);
+		unsigned char* buffer = new unsigned char[BUFFER_SIZE];
+		/// Returns the number of bytes received.
+		/// A return value of 0 means a graceful shutdown
+		/// of the connection from the peer.
+		int n = socket.receiveBytes(buffer, BUFFER_SIZE);
+		buffer[n] = '\0';
+		std::cout << "Server Message: " << std::endl;
+		std::cout << n << std::endl;
+		std::cout << buffer << std::endl;
 	}
 	catch (Exception& exc)
 	{
-		std::cerr << "ClientConnection: " << exc.displayText() << std::endl;
+		std::cerr << "TCPClient: " << exc.displayText() << std::endl;
 	}
 	return 0;
 }
