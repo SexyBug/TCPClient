@@ -18,7 +18,8 @@ int main(int argc, const char* argv[])
 		StreamSocket socket(address);
 		unsigned char c[] = {0x01,0x00,0x02,0x03,0x00};
 		socket.sendBytes(c,5);
-		//Sleep(10000);
+		int a[] = { 256 };
+		socket.sendBytes(a,4);
 		unsigned char* buffer = new unsigned char[BUFFER_SIZE];
 		/// Returns the number of bytes received.
 		/// A return value of 0 means a graceful shutdown
